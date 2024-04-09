@@ -16,6 +16,12 @@ uchar bit_set = 0;
 uint function_key = 0x3f;
 //                0     1      2    3       4      5    6     7    8     9     a    b      c    d      e     f    dp
 uchar key_tab[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x80};
+
+// uchar key_tab[][] = {{},
+//                     {},
+//                     {},
+//                     {}}
+
 // delay 10ms
 void delay_10ms(void)
 {
@@ -55,12 +61,12 @@ uchar read_key(uint read_bus, uint write_bus)
     }
     return key;
 }
-void display_key(uchar key, uint display_bus, uint display_bit_bus, uchar bit)
+void display_key(uchar key_char, uint display_bus, uint display_bit_bus, uchar bit)
 {
     // display key on display
     uchar xdata *display_bus_pointer;
     display_bus_pointer = display_bus;
-    *display_bus_pointer = key_tab[key];
+    *display_bus_pointer = key_char;
     // set display bit
     display_bus_pointer = display_bit_bus;
     *display_bus_pointer = bit;
