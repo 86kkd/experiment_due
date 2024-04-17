@@ -1,9 +1,9 @@
 <table font-size="1px">
-  <th>xuehao:</th>
+  <th>学号:</th>
   <th></th>
   <th>姓名:</th>
   <th></th>
-  <th>pici</th>
+  <th>批次</th>
   <th></th>
 </table>
 
