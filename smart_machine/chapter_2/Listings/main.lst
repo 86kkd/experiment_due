@@ -1,0 +1,656 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include <absacc.h>
+   3          #define ADDR_KEY_READ     0x9001
+   4          #define ADDR_KEY_WRITE    0x9002
+   5          typedef unsigned char uchar;
+   6          typedef unsigned int uint;
+   7          
+   8          unsigned char code KEY_NUMBER[]={
+   9          
+  10          7,  8,  9,  10, 'T',  'R',
+  11          
+  12          4,  5,  6,  11, 'S',  'M',
+  13          
+  14          1,  2,  3,  12, 'H',  'L',
+  15          
+  16          0,  15, 14, 13, 'X',  'N'
+  17          };//按键键名
+  18          
+  19          //显示按键键名
+  20          #define MODE_0  (unsigned char)0
+  21          #define MODE_1  (unsigned char)1
+  22          #define MODE_2  (unsigned char)2
+  23          #define MODE_3  (unsigned char)3
+  24          
+  25          #define PD1  61        //  122/2 分成左右两半屏(122x32)
+  26          
+  27          unsigned char Column;
+  28          unsigned char Page_ ;  // 页地址寄存器 D1,DO:页地址
+  29          unsigned char Code_ ;  // 字符代码寄存器
+  30          
+  31          unsigned char Command; // 指令寄存器
+  32          unsigned char LCDData; // 数据寄存器
+  33          
+  34          xdata unsigned char CWADD1 _at_ 0x8000;   // 写指令代码地址(E1)
+  35          xdata unsigned char DWADD1 _at_ 0x8001;   // 写显示数据地址(E1)
+  36          xdata unsigned char CRADD1 _at_ 0x8002;   // 读状态字地址(E1)
+  37          xdata unsigned char DRADD1 _at_ 0x8003;   // 读显示数据地址(E1)
+  38          
+  39          xdata unsigned char CWADD2 _at_ 0x8004;   // 写指令代码地址(E2)
+  40          xdata unsigned char DWADD2 _at_ 0x8005;   // 写显示数进地址(E2)
+  41          xdata unsigned char CRADD2 _at_ 0x8006;   // 读状态字地址(E2)
+  42          xdata unsigned char DRADD2 _at_ 0x8007;   // 读显示数据地址(E2)
+  43          
+  44          ////英文字模库    8x8 点阵
+  45          //code unsigned char EETAB[][8]={
+  46          //        {0x38,0x44,0x44,0x44,0x44,0x44,0x38,0x00},  // 0
+  47          //        {0x10,0x30,0x50,0x10,0x10,0x10,0x7c,0x00},  // 1
+  48          //        {0x38,0x44,0x04,0x08,0x10,0x20,0x7c,0x00},  // 2
+  49          //        {0x78,0x84,0x04,0x38,0x04,0x84,0x78,0x00}}; // 3
+  50          
+  51          // 中文字模库   16x16点阵
+  52          code unsigned char CCTAB[][32] ={
+  53                  {0x08,0x28,0x49,0x8a,0x0e,0x88,0x78,0x0c,0x08,0x00,0xfc,0x00,0x00,0xff,0x00,0x00,
+  54          0x40,0x20,0x10,0x09,0x06,0x09,0x30,0x60,0x00,0x00,0x0f,0x40,0x80,0x7f,0x00,0x00,},//刘
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 2   
+
+  55          
+  56                  {0x80,0x44,0x24,0x9f,0x84,0xa4,0xc4,0xbc,0x80,0xbc,0xa4,0xe4,0xa4,0x3e,0x04,0x00,
+  57          0x00,0x00,0x80,0x9f,0x40,0x40,0x20,0x1e,0x20,0x20,0x40,0x5f,0x80,0x00,0x00,0x00},//贺
+  58          
+  59          };
+  60          
+  61          void display_key(uchar key_char, uint display_bus, uint display_bit_bus, uchar bit_)
+  62          {
+  63   1          // display key on display display_key(0xff,0x9004,0x9002,0x00);
+  64   1          uchar xdata *display_bus_pointer;
+  65   1          display_bus_pointer = 0x9004;
+  66   1          *display_bus_pointer = 0xff;
+  67   1          // set display bit
+  68   1          display_bus_pointer = 0x9002;
+  69   1          *display_bus_pointer = 0x00;
+  70   1          delay_10ms();
+*** WARNING C206 IN LINE 70 OF main.c: 'delay_10ms': missing function-prototype
+  71   1      }
+*** WARNING C280 IN LINE 61 OF main.c: 'key_char': unreferenced local variable
+*** WARNING C280 IN LINE 61 OF main.c: 'display_bus': unreferenced local variable
+*** WARNING C280 IN LINE 61 OF main.c: 'display_bit_bus': unreferenced local variable
+*** WARNING C280 IN LINE 61 OF main.c: 'bit_': unreferenced local variable
+  72          
+  73          unsigned char key_scan(void);                   //按键扫描
+  74          void Delay5ms();                                //软件延时
+  75          void DisplayMode_switch(unsigned char key_num); //LCD显示模式切换
+  76                   
+  77          
+  78          void WriteCommandE1();    // 1.写指令代码子程序(E1)    
+  79          void WriteDataE1();       // 2.写显示数据子程序(E1)    
+  80          void ReadDataE1();        // 3.读显示数据子程序(E1)      
+  81          void WriteCommandE2();    // 4.写指令代码子程序(E2)      
+  82          void WriteDataE2();       // 5.写显示数据子程序(E2)      
+  83          void ReadDataE2();        // 6.读显示数据子程序(E2)  
+  84          void Init();              // 初始化程序 
+  85          void Clear();             // 清屏
+  86          void Delay();             // 延时程序
+  87          void WriteCHN16x16();     // 中文显示子程序
+  88          void WriteEN8x8(void);    //英文显示子程序
+  89          
+  90          
+  91          void main(void)
+  92          {
+  93   1        unsigned char key_pos = 0;
+  94   1          
+  95   1        //display_key(0xff,0x9004,0x9002,0x00);
+  96   1        Delay5ms(); 
+  97   1        //LCD初始化
+  98   1        Init();
+  99   1        Clear();
+ 100   1      
+ 101   1            Page_ = 0x03;
+ 102   1            Column = 0x00+5;
+ 103   1            Code_ = 0x1C;
+ 104   1            WriteCHN16x16();
+ 105   1        
+ 106   1            Page_ = 0x03;
+ 107   1            Column = 0x10+5;
+ 108   1            Code_ = 0x1D;
+ 109   1            WriteCHN16x16();
+ 110   1        
+ 111   1            Page_ = 0x03;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 3   
+
+ 112   1            Column = 0x20+5;
+ 113   1            Code_ = 0x1E;
+ 114   1            WriteCHN16x16();
+ 115   1        
+ 116   1        
+ 117   1        
+ 118   1            Page_ = 0x03;
+ 119   1            Column = 0x30+5;
+ 120   1            Code_ = 0x00;
+ 121   1            WriteCHN16x16();
+ 122   1        
+ 123   1            Page_ = 0x03;
+ 124   1            Column = 0x40+5;
+ 125   1            Code_ = 0x01;
+ 126   1            WriteCHN16x16();
+ 127   1        
+ 128   1            Page_ = 0x03;
+ 129   1            Column = 0x50+5;
+ 130   1            Code_ = 0x02;
+ 131   1            WriteCHN16x16();
+ 132   1            
+ 133   1            Page_ = 0x03;
+ 134   1            Column = 0x60+5;
+ 135   1            Code_ = 0x03;
+ 136   1            WriteCHN16x16();
+ 137   1            
+ 138   1            while(key_scan() == 0xff);
+ 139   1            Clear();
+ 140   1            display_key(0xff,0x9004,0x9002,0x00);
+ 141   1        
+ 142   1        while(1)
+ 143   1        {
+ 144   2          key_pos = key_scan();
+ 145   2          if(key_pos != 0xff)
+ 146   2            DisplayMode_switch(KEY_NUMBER[key_pos]);
+ 147   2          
+ 148   2        }
+ 149   1        
+ 150   1        
+ 151   1      }
+ 152          
+ 153          void DisplayMode_switch(unsigned char key_num)
+ 154          {
+ 155   1        switch(key_num)
+ 156   1        {
+ 157   2          case 7://显示模式0
+ 158   2          {
+ 159   3            Page_ = 0x02;     //设置显示行
+ 160   3            Column = 13;    //设置显示列
+ 161   3            Code_ = 0x04;
+ 162   3            WriteCHN16x16();
+ 163   3            
+ 164   3          }break;
+ 165   2          case 8://显示模式1
+ 166   2          {
+ 167   3            Page_ = 0x02;
+ 168   3            Column = 0x10;
+ 169   3            Code_ = 0x05;
+ 170   3            WriteCHN16x16();
+ 171   3            
+ 172   3          }break;
+ 173   2          case 9://显示模式2
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 4   
+
+ 174   2          {
+ 175   3            Page_ = 0x02;
+ 176   3            Column = 0x20;
+ 177   3            Code_ = 0x06;
+ 178   3            WriteCHN16x16();
+ 179   3            
+ 180   3          }break;
+ 181   2          case 10://显示模式3
+ 182   2          {
+ 183   3            Page_ = 0x02;
+ 184   3            Column = 0x30;
+ 185   3            Code_ = 0x07;
+ 186   3            WriteCHN16x16();
+ 187   3            
+ 188   3          }break;
+ 189   2          case ('T')://显示模式4
+ 190   2          {
+ 191   3            Page_ = 0x02;
+ 192   3            Column = 0x40;
+ 193   3            Code_ = 0x08;
+ 194   3            WriteCHN16x16();
+ 195   3            
+ 196   3          }break;
+ 197   2          case ('R')://显示模式5
+ 198   2          {
+ 199   3            Page_ = 0x02;
+ 200   3            Column = 0x50;
+ 201   3            Code_ = 0x09;
+ 202   3            WriteCHN16x16();
+ 203   3            
+ 204   3          }break;
+ 205   2          
+ 206   2          //*******************************************
+ 207   2          
+ 208   2          case 4://显示模式0
+ 209   2          {
+ 210   3            Page_ = 0x00;     //设置显示行
+ 211   3            Column = 0x00;    //设置显示列
+ 212   3            Code_ = 0x0A;
+ 213   3            WriteCHN16x16();
+ 214   3            
+ 215   3          }break;
+ 216   2          case 5://显示模式1
+ 217   2          {
+ 218   3            Page_ = 0x00;
+ 219   3            Column = 0x10;
+ 220   3            Code_ = 0x0B;
+ 221   3            WriteCHN16x16();
+ 222   3            
+ 223   3          }break;
+ 224   2          case 6://显示模式2
+ 225   2          {
+ 226   3            Page_ = 0x00;
+ 227   3            Column = 0x20;
+ 228   3            Code_ = 0x0C;
+ 229   3            WriteCHN16x16();
+ 230   3            
+ 231   3          }break;
+ 232   2          case 11://显示模式3
+ 233   2          {
+ 234   3            Page_ = 0x00;
+ 235   3            Column = 0x30;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 5   
+
+ 236   3            Code_ = 0x0D;
+ 237   3            WriteCHN16x16();
+ 238   3            
+ 239   3          }break;
+ 240   2          case ('S')://显示模式4
+ 241   2          {
+ 242   3            Page_ = 0x00;
+ 243   3            Column = 0x40;
+ 244   3            Code_ = 0x0E;
+ 245   3            WriteCHN16x16();
+ 246   3            
+ 247   3          }break;
+ 248   2          case ('M')://显示模式5
+ 249   2          {
+ 250   3            Page_ = 0x00;
+ 251   3            Column = 0x50;
+ 252   3            Code_ = 0x0F;
+ 253   3            WriteCHN16x16();
+ 254   3            
+ 255   3          }break;
+ 256   2          
+ 257   2          //*******************************************
+ 258   2          
+ 259   2          case 1://显示模式0
+ 260   2          {
+ 261   3            Page_ = 0x02;     //设置显示行
+ 262   3            Column = 0x00;    //设置显示列
+ 263   3            Code_ = 0x10;
+ 264   3            WriteCHN16x16();
+ 265   3            
+ 266   3          }break;
+ 267   2          case 2://显示模式1
+ 268   2          {
+ 269   3            Page_ = 0x02;
+ 270   3            Column = 0x10;
+ 271   3            Code_ = 0x11;
+ 272   3            WriteCHN16x16();
+ 273   3            
+ 274   3          }break;
+ 275   2          case 3://显示模式2
+ 276   2          {
+ 277   3            Page_ = 0x02;
+ 278   3            Column = 0x20;
+ 279   3            Code_ = 0x12;
+ 280   3            WriteCHN16x16();
+ 281   3            
+ 282   3          }break;
+ 283   2          case 12://显示模式3
+ 284   2          {
+ 285   3            Page_ = 0x02;
+ 286   3            Column = 0x30;
+ 287   3            Code_ = 0x13;
+ 288   3            WriteCHN16x16();
+ 289   3            
+ 290   3          }break;
+ 291   2          case ('H')://显示模式4
+ 292   2          {
+ 293   3            Page_ = 0x02;
+ 294   3            Column = 0x40;
+ 295   3            Code_ = 0x14;
+ 296   3            WriteCHN16x16();
+ 297   3            
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 6   
+
+ 298   3          }break;
+ 299   2          case ('L')://显示模式5
+ 300   2          {
+ 301   3            Page_ = 0x02;
+ 302   3            Column = 0x50;
+ 303   3            Code_ = 0x15;
+ 304   3            WriteCHN16x16();
+ 305   3            
+ 306   3          }break;
+ 307   2          
+ 308   2          //*******************************************
+ 309   2          
+ 310   2          //*******************************************
+ 311   2          
+ 312   2          case 0://显示模式0
+ 313   2          {
+ 314   3            Page_ = 0x00;     //设置显示行
+ 315   3            Column = 0x00;    //设置显示列
+ 316   3            Code_ = 0x16;
+ 317   3            WriteCHN16x16();
+ 318   3            
+ 319   3          }break;
+ 320   2          case 15://显示模式1
+ 321   2          {
+ 322   3            Page_ = 0x00;
+ 323   3            Column = 0x10;
+ 324   3            Code_ = 0x17;
+ 325   3            WriteCHN16x16();
+ 326   3            
+ 327   3          }break;
+ 328   2          case 14://显示模式2
+ 329   2          {
+ 330   3            Page_ = 0x00;
+ 331   3            Column = 0x20;
+ 332   3            Code_ = 0x18;
+ 333   3            WriteCHN16x16();
+ 334   3            
+ 335   3          }break;
+ 336   2          case 13://显示模式3
+ 337   2          {
+ 338   3            Page_ = 0x00;
+ 339   3            Column = 0x30;
+ 340   3            Code_ = 0x19;
+ 341   3            WriteCHN16x16();
+ 342   3            
+ 343   3          }break;
+ 344   2          case ('X')://显示模式4
+ 345   2          {
+ 346   3            Page_ = 0x00;
+ 347   3            Column = 0x40;
+ 348   3            Code_ = 0x1A;
+ 349   3            WriteCHN16x16();
+ 350   3            
+ 351   3          }break;
+ 352   2          case ('N')://显示模式5
+ 353   2          {
+ 354   3            Page_ = 0x00;
+ 355   3            Column = 0x50;
+ 356   3            Code_ = 0x1B;
+ 357   3            WriteCHN16x16();
+ 358   3            
+ 359   3          }break;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 7   
+
+ 360   2          
+ 361   2          
+ 362   2          default:break;//其余情况不更新显示
+ 363   2          
+ 364   2        }
+ 365   1        
+ 366   1      }
+ 367          
+ 368          unsigned char key_scan(void)
+ 369          {
+ 370   1        unsigned char scan_data = 0x20;//列扫描用IO输出数据
+ 371   1        unsigned char row = 0, col = 0;
+ 372   1        unsigned char key_pos = 0xff;
+ 373   1        //检测是否有按键按下
+ 374   1        XBYTE[ADDR_KEY_WRITE] = 0x00;
+ 375   1        if((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f)//有按键按下
+ 376   1        {
+ 377   2          //按键消抖
+ 378   2          Delay5ms();
+ 379   2            
+ 380   2          
+ 381   2          //进行列检测
+ 382   2          XBYTE[0x9004] = 0x00;
+ 383   2          XBYTE[ADDR_KEY_WRITE] = scan_data;
+ 384   2          while((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f)//检测到0x0f时即找到该列
+ 385   2          {
+ 386   3            col ++;
+ 387   3            scan_data  = scan_data >> 1;
+ 388   3            XBYTE[ADDR_KEY_WRITE] = scan_data;
+ 389   3            
+ 390   3          }
+ 391   2          
+ 392   2          //进行行检测
+ 393   2          XBYTE[ADDR_KEY_WRITE] = 0x00;
+ 394   2          switch(XBYTE[ADDR_KEY_READ] & 0x0f)
+ 395   2          {
+ 396   3            case 0x07:row = 0;break;
+ 397   3            case 0x0b:row = 1;break;
+ 398   3            case 0x0d:row = 2;break;
+ 399   3            case 0x0e:row = 3;break;
+ 400   3            default:key_pos = 0xff;break;
+ 401   3            
+ 402   3          }
+ 403   2          
+ 404   2          //合成按键位置
+ 405   2          key_pos = row*6 + col;
+ 406   2          
+ 407   2          while((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f);
+ 408   2          
+ 409   2          
+ 410   2          return key_pos;
+ 411   2          
+ 412   2        }
+ 413   1        else if((XBYTE[ADDR_KEY_READ] & 0x0f) == 0x0f)//没有按键按下
+ 414   1        {
+ 415   2          
+ 416   2          return 0xff;//返回特殊值
+ 417   2          
+ 418   2        }
+ 419   1        
+ 420   1      }
+ 421          
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 8   
+
+ 422          
+ 423          
+ 424          
+ 425          void Delay5ms()   //@12.000MHz
+ 426          {
+ 427   1        unsigned char i, j;
+ 428   1      
+ 429   1        i = 10;
+ 430   1        j = 183;
+ 431   1        do
+ 432   1        {
+ 433   2          while (--j);
+ 434   2        } while (--i);
+ 435   1      }
+ 436          
+ 437          
+ 438          // 1.写指令代码子程序(E1)
+ 439          void WriteCommandE1()
+ 440          {
+ 441   1        while(CRADD1 & 0x80);
+ 442   1        CWADD1 = Command;
+ 443   1      }
+ 444          
+ 445          // 2.写显示数据子程序(E1)
+ 446          void WriteDataE1()
+ 447          {
+ 448   1        while(CRADD1 & 0x80);
+ 449   1        DWADD1 = LCDData;
+ 450   1      }
+ 451          
+ 452          // 3.读显示数据子程序(E1)
+ 453          void ReadDataE1()
+ 454          {
+ 455   1        while(CRADD1 & 0x80);
+ 456   1        LCDData = DRADD1;
+ 457   1      }
+ 458          
+ 459          // 4.写指令代码子程序(E2)
+ 460          void WriteCommandE2()
+ 461          {
+ 462   1        while(CRADD2 & 0x80);
+ 463   1        CWADD2 = Command;
+ 464   1      }
+ 465          
+ 466          // 5.写显示数据子程序(E2)
+ 467          void WriteDataE2()
+ 468          {
+ 469   1        while(CRADD2 & 0x80);
+ 470   1        DWADD2 = LCDData;
+ 471   1      }
+ 472          
+ 473          // 6.读显示数据子程序(E2)
+ 474          void ReadDataE2()
+ 475          {
+ 476   1        while(CRADD2 & 0x80);
+ 477   1        LCDData = DRADD2;
+ 478   1      }
+ 479          
+ 480          // 初始化程序
+ 481          void Init()
+ 482          {
+ 483   1        Command = 0xe2;
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 9   
+
+ 484   1        WriteCommandE1();
+ 485   1        WriteCommandE2();
+ 486   1      
+ 487   1        Command = 0xa4;
+ 488   1        WriteCommandE1();
+ 489   1        WriteCommandE2();
+ 490   1      
+ 491   1        Command = 0xa9;
+ 492   1        WriteCommandE1();
+ 493   1        WriteCommandE2();
+ 494   1      
+ 495   1        Command = 0xa0;
+ 496   1        WriteCommandE1();
+ 497   1        WriteCommandE2();
+ 498   1      
+ 499   1        Command = 0xc0;
+ 500   1        WriteCommandE1();
+ 501   1        WriteCommandE2();
+ 502   1      
+ 503   1        Command = 0xaf;
+ 504   1        WriteCommandE1();
+ 505   1        WriteCommandE2();
+ 506   1      }
+ 507          
+ 508          // 清屏
+ 509          void Clear()
+ 510          {
+ 511   1        unsigned char i,j;
+ 512   1      
+ 513   1        i = 0;
+ 514   1        do {
+ 515   2      
+ 516   2          Command = (i + 0xb8); // 页地址设置
+ 517   2          WriteCommandE1();
+ 518   2          WriteCommandE2();
+ 519   2      
+ 520   2          Command = 0x00;      // 列地址设置为"0"
+ 521   2          WriteCommandE1();
+ 522   2          WriteCommandE2();
+ 523   2      
+ 524   2          j = 0x50;            // 一页清 80个字节
+ 525   2          do {
+ 526   3            LCDData = 0x00;    // 显示数据为"0"
+ 527   3            WriteDataE1();
+ 528   3            WriteDataE2();
+ 529   3          }while(--j !=0);     // 页内字节清零循环
+ 530   2      
+ 531   2        }while(++i !=4);       // 页地址暂存器加一
+ 532   1                               // 显示区清零循环
+ 533   1      }
+ 534          
+ 535          // 延时程序
+ 536          void Delay()
+ 537          {
+ 538   1        unsigned char i,j;
+ 539   1        i = 20;
+ 540   1        j = 0;
+ 541   1        do{
+ 542   2          do{
+ 543   3          }while(--j !=0);
+ 544   2        }while( --i != 0 );
+ 545   1      }
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 10  
+
+ 546          
+ 547          // 中文显示子程序
+ 548          void WriteCHN16x16()
+ 549          {
+ 550   1        unsigned char i,j,k;
+ 551   1      
+ 552   1        i = 0;
+ 553   1        j = 0;
+ 554   1        while(j<2) {
+ 555   2          Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
+ 556   2          WriteCommandE1();
+ 557   2          WriteCommandE2();
+ 558   2          k = Column;                   // 列地址值
+ 559   2          while(k < Column + 16){
+ 560   3            if (k < PD1) {              // 为左半屏显示区域(E1)
+ 561   4              Command = k;
+ 562   4              WriteCommandE1();         // 设置列地址值
+ 563   4              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+ 564   4              WriteDataE1();            // 写字模数据
+ 565   4            } else{                     // 为右半屏显示区域(E2)
+ 566   4              Command = k-PD1;
+ 567   4              WriteCommandE2();         // 设置列地址值
+ 568   4              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+ 569   4              WriteDataE2();            // 写字模数据
+ 570   4            };
+ 571   3      
+ 572   3            i++;
+ 573   3            if( ++k >= PD1 * 2) break;  // 列地址是否超出显示范围
+ 574   3          } ;
+ 575   2          j++;
+ 576   2        };
+ 577   1      }
+ 578          
+ 579          //英文显示子程序
+ 580          void WriteEN8x8(void)
+ 581          {
+ 582   1          unsigned char i,j,k;
+ 583   1      
+ 584   1          i = 0;
+ 585   1          j = 0;
+ 586   1        
+ 587   1          Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
+ 588   1          WriteCommandE1();
+ 589   1          WriteCommandE2();
+ 590   1          k = Column;                   // 列地址值
+ 591   1      
+ 592   1            if (k < PD1) {              // 为左半屏显示区域(E1)
+ 593   2              Command = k;
+ 594   2              WriteCommandE1();         // 设置列地址值
+ 595   2              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+ 596   2              WriteDataE1();            // 写字模数据
+ 597   2            } else{                     // 为右半屏显示区域(E2)
+ 598   2              Command = k-PD1;
+ 599   2              WriteCommandE2();         // 设置列地址值
+ 600   2              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+ 601   2              WriteDataE2();            // 写字模数据
+ 602   2            };
+ 603   1      
+ 604   1            i++;
+ 605   1      }
+ 606          
+*** WARNING C291 IN LINE 420 OF main.c: not every exit path returns a value
+C51 COMPILER V9.60.7.0   MAIN                                                              04/22/2024 08:57:55 PAGE 11  
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1074    ----
+   CONSTANT SIZE    =     88    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5      11
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  6 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,11 @@
+{
+    "files.encoding": "gbk",
+    "files.associations": {
+        "absacc.h": "c",
+        "character.h": "c",
+        "reg51.h": "c",
+        "REG51.H": "cpp",
+        "ABSACC.H": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

@@ -1,0 +1,154 @@
+C51 COMPILER V9.60.7.0   CHAPTER_1                                                         04/21/2024 23:31:07 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE CHAPTER_1
+OBJECT MODULE PLACED IN .\Objects\chapter_1.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE chapter_1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\chapter_1.lst) TABS(2) OBJECT(.\Objects\chapter_1.obj)
+
+line level    source
+
+   1          // #include <8051.h>
+   2          #include <reg51.h>
+   3          #include <absacc.h>
+   4          #ifdef REG8051_H
+              #define xdata __xdata
+              #endif
+   7          
+   8          #define uchar unsigned char
+   9          #define uint unsigned int
+  10          
+  11          #define ADDR_KEY_READ 0x9001
+  12          #define ADDR_KEY_WRITE  0x9002
+  13          // restore key to 40H
+  14          uchar key = 0x40;
+  15          // setting key/led cs
+  16          uint cs_key = 0x9000;
+  17          // setting bus to display
+  18          uchar bit_set = 0;
+  19          uint function_key = 0x3f;
+  20          //                0     1      2    3       4      5    6     7    8     9     a    b      c    d      e  
+             -   f    dp
+  21          uchar key_tab[] = {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f,
+  22                           0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71, 0x80};
+  23          
+  24          // uchar key_tab[][] = {{},
+  25          //                     {},
+  26          //                     {},
+  27          //                     {}}
+  28          
+  29          // delay 10ms
+  30          void delay_10ms(void)
+  31          {
+  32   1          uint i, j;
+  33   1          for (i = 0; i < 100; i++)
+  34   1              for (j = 0; j < 120; j++)
+  35   1                  ;
+  36   1      }
+  37          
+  38          // sacnning keys from 0xX000 to 0xX008
+  39          unsigned char read_key(void)
+  40          {
+  41   1        unsigned char scan_data = 0x01;//列扫描用IO输出数据
+  42   1        unsigned char row = 0, col = 0;
+  43   1        unsigned char key_pos = 0xff;
+  44   1        //检测是否有按键按下
+  45   1        XBYTE[ADDR_KEY_WRITE] = 0x00;
+  46   1        if((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f)//有按键按下
+  47   1        {
+  48   2          //按键消抖
+  49   2          Delay5ms();
+*** WARNING C206 IN LINE 49 OF chapter_1.c: 'Delay5ms': missing function-prototype
+  50   2          
+  51   2          //进行列检测
+  52   2          XBYTE[ADDR_KEY_WRITE] = scan_data;
+C51 COMPILER V9.60.7.0   CHAPTER_1                                                         04/21/2024 23:31:07 PAGE 2   
+
+  53   2          while((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f)//检测到0x0f时即找到该列
+  54   2          {
+  55   3            col ++;
+  56   3            scan_data  = scan_data << 1;
+  57   3            XBYTE[ADDR_KEY_WRITE] = scan_data;
+  58   3          }
+  59   2          
+  60   2          //进行行检测
+  61   2          XBYTE[ADDR_KEY_WRITE] = 0x00;
+  62   2          switch(XBYTE[ADDR_KEY_READ] & 0x0f)
+  63   2          {
+  64   3            case 0x07:row = 0;break;
+  65   3            case 0x0b:row = 1;break;
+  66   3            case 0x0d:row = 2;break;
+  67   3            case 0x0e:row = 3;break;
+  68   3            default:key_pos = 0xff;break;
+  69   3            
+  70   3          }
+  71   2          
+  72   2          //合成按键位置
+  73   2          key_pos = row*6 + col;
+  74   2          
+  75   2          while((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f);
+  76   2      
+  77   2          
+  78   2          
+  79   2          return key_pos;
+  80   2          
+  81   2        }
+  82   1        else
+  83   1          return 0xff;
+  84   1      }
+  85          
+  86          void display_key(uchar key_char, uint display_bus, uint display_bit_bus, uchar bit_)
+  87          {
+  88   1          // display key on display
+  89   1          uchar xdata *display_bus_pointer;
+  90   1          display_bus_pointer = display_bus;
+*** WARNING C289 IN LINE 90 OF chapter_1.c: '=': converting non-pointer to pointer
+  91   1          *display_bus_pointer = key_char;
+  92   1          // set display bit
+  93   1          display_bus_pointer = display_bit_bus;
+*** WARNING C289 IN LINE 93 OF chapter_1.c: '=': converting non-pointer to pointer
+  94   1          *display_bus_pointer = bit_;
+  95   1          delay_10ms();
+  96   1      }
+  97          void main()
+  98          {
+  99   1          uint write_bus = cs_key | 0x02;
+ 100   1          uint read_bus = cs_key | 0x01;
+ 101   1          uint display_bus = cs_key | 0x04;
+ 102   1          uint display_bit_bus = cs_key | 0x02;
+ 103   1          uchar row;
+ 104   1          uchar col;
+ 105   1          uchar display_char;
+ 106   1        
+ 107   1          while (1)
+ 108   1          {
+ 109   2              /* code */
+ 110   2              uchar key = read_key();
+ 111   2              if (key == 0) continue;// if no key continue
+ 112   2      
+C51 COMPILER V9.60.7.0   CHAPTER_1                                                         04/21/2024 23:31:07 PAGE 3   
+
+ 113   2              row = key & 0x0f;
+ 114   2              col = key >> 4;
+ 115   2              if (key == function_key)
+ 116   2              {
+ 117   3                  bit_set = (bit_set << 1);
+ 118   3              }
+ 119   2              display_char = key_tab[row * 4 + col];
+ 120   2              display_key(display_char, display_bus, display_bit_bus, bit_set);
+ 121   2          }
+ 122   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    284    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     23      22
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  3 WARNING(S),  0 ERROR(S)

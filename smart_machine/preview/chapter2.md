@@ -1,6 +1,6 @@
 批次/序号： 
 <center style="font-size:25px; margin-bottom:10pt; margin-top:10">桂林电子科技大学 电子工程与自动化学院</center>
-<center style="font-size:20px">智能仪器实验 总结报告</center>
+<center style="font-size:20px">智能仪器实验 预习报告</center>
 <table style="margin-top:20pt; margin-bottom:8pt; width:486.2pt; margin-bottom:0pt; border-collapse:collapse">
 				<tr style="height:27.4pt">
 					<td rowspan="2" style="width:65.35pt; padding-left:4.25pt; vertical-align:bottom">
@@ -145,47 +145,154 @@
  -->
 </table>
 
+# 一、实验原理理解和任务分析（20分，得分： ）
 
-# 完成情况介绍（20分，得分： ）
+1. 如何使用循环扫描按键
+2. 如何通过行列值查找按键的数码表
+3. 如何使用使用c语言实现液晶显示
+4. 如何存储按键
+5. 如何如何制定显示位置
+6. 如何确定显示数字
+
+# 二、设计思路介绍（25分，得分： ）
 
 
-
-1. 完成按键扫描并去都抖动功能
-
-2. 完成在制定数码管显示功能
-
-
-# 实验结果和数据处理（25分，得分： ）
+1. 使用宏定义区分keil和sdcc编译器的预操作
+2. 使用全局变量控制地址
+3. 使用位运算得到目标地址
+4. 使用函数实现read key和display key实现读取和显示的解耦
+5. 使用while循环实现key的循环扫描
 
 
+# 三、程序流程图介绍（25分，得分： ）
 <center>
 
-| 按键 | 0    | 1    | 2    | 3    | 4    | 5    | 6    | 7    | 8    | 9    | A    | B    | C    | D    | E    | F    |
-| -------- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- | ---- |
-|  列值      |1     |3     |2     |1     |3     |2     |1     |3     |2     |1     |4     |4     |4     |4     |3     |2     |
-|行值    |4|3|3|3|2|2|2|1|1|1|1|2|3|4|4|4|
-|键值    |0x41|0x33|0x32|0x31|0x23|0x22|0x21|0x31|0x21|0x11|0x41|0x42|0x43|0x44|0x34|0x24|
+![img](chapter1.png)
 
 </center>
 
-# 主要问题分析（25分，得分： ）
+# 四、主程序介绍（20分，得分： ）
 
+main function 计算总线地址并启动主循环开始扫描按键并显示
+```c
+void main()
+{
+    uint write_bus = cs_key | 0x02;
+    uint read_bus = cs_key | 0x01;
+    uint display_bus = cs_key | 0x04;
+    uint display_bit_bus = cs_key | 0x02;
+    while (1)
+    {
+        /* code */
+        uchar key = read_key(read_bus, write_bus);
+        if (key == 0) continue;// if no key continue
 
-1. 实验过程中在main内定义局部变量时出现编译报错问题,暂时不知道问题原因
+        uchar row = key & 0x0f;
+        uchar col = key >> 4;
+        if (key == function_key)
+        {
+            bit_set = (bit_set << 1);
+        }
+        uchar display_char = key_tab[row * 4 + col];
+        display_key(display_char, display_bus, display_bit_bus, bit_set);
+    }
+}
+```
+read_key funtion 控制74h374循环输出0并读取键，如果读到了键将行放在高8位列放在低8位
+```c
+// sacnning keys from 0xX000 to 0xX008
+uchar read_key(uint read_bus, uint write_bus)
+{
+    uchar xdata *key_bus_pointer;
+    uchar i;
+    uint key;
+    for (i = 0; i < 8; i++)
+    {
+        // set read bus address
+        key_bus_pointer = write_bus | (i * 2);
+        // wite 0 to output
+        *key_bus_pointer = 0;
+        // read form read_buf
+        key_bus_pointer = read_bus;
+        key = *key_bus_pointer;
+        delay_10ms();
+        if (key != 0xFF)
+            break;
+    }
+    if (i >= 8)
+    {
+        // low 8 bit is col hight 8 bit is row
+        key = ~key << 8 | i;
+    }
+    else //check if there is key
+    {
+        key = 0;
+    }
+    return key;
+}
+```
 
-2. 使用char变量来计数时无法进行++等等数学计算
+display_bus function 控制数码管输出key
 
-3. 实验室没有连接实验箱导致代码行为异常
+```c
+// 中文显示子程序
+void WriteCHN16x16()
+{
+  unsigned char i,j,k;
 
-4. 不熟悉keil代码语法导致浪费时间
+  i = 0;
+  j = 0;
+  while(j<2) {
+    Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
+    WriteCommandE1();
+    WriteCommandE2();
+    k = Column;                   // 列地址值
+    while(k < Column + 16){
+      if (k < PD1) {              // 为左半屏显示区域(E1)
+        Command = k;
+        WriteCommandE1();         // 设置列地址值
+        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+        WriteDataE1();            // 写字模数据
+      } else{                     // 为右半屏显示区域(E2)
+        Command = k-PD1;
+        WriteCommandE2();         // 设置列地址值
+        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+        WriteDataE2();            // 写字模数据
+      };
 
-5. 读断码没有初始化位导致数码管显示问题
+      i++;
+      if( ++k >= PD1 * 2) break;  // 列地址是否超出显示范围
+    } ;
+    j++;
+  };
+}
 
+//英文显示子程序
+void WriteEN8x8(void)
+{
+	  unsigned char i,j,k;
 
-# 归纳总结（20分，得分： ）
+		i = 0;
+		j = 0;
+	
+		Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
+    WriteCommandE1();
+    WriteCommandE2();
+    k = Column;                   // 列地址值
 
+      if (k < PD1) {              // 为左半屏显示区域(E1)
+        Command = k;
+        WriteCommandE1();         // 设置列地址值
+        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+        WriteDataE1();            // 写字模数据
+      } else{                     // 为右半屏显示区域(E2)
+        Command = k-PD1;
+        WriteCommandE2();         // 设置列地址值
+        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+        WriteDataE2();            // 写字模数据
+      };
 
-1. 熟悉软件，熟悉代码语法
-
-2. 学习指针的读取和使用
-
+      i++;
+//      if( ++k >= PD1 * 2)  // 列地址是否超出显示范围
+	
+}```

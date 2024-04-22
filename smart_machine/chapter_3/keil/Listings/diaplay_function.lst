@@ -1,0 +1,114 @@
+C51 COMPILER V9.60.7.0   DIAPLAY_FUNCTION                                                  04/22/2024 11:15:07 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DIAPLAY_FUNCTION
+OBJECT MODULE PLACED IN .\Objects\diaplay_function.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\diaplay_function.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\diaplay_function.lst) TABS(2) OBJECT(.\Objects\diaplay_function.obj)
+
+line level    source
+
+   1          typedef unsigned char uchar;
+   2          typedef unsigned int uint;
+   3          
+   4          extern xdata unsigned char CWADD1 ;   // 写指令代码地址(E1)
+   5          extern xdata unsigned char DWADD1 ;   // 写显示数据地址(E1)
+   6          extern xdata unsigned char CRADD1 ;   // 读状态字地址(E1)
+   7          extern xdata unsigned char DRADD1 ;   // 读显示数据地址(E1)
+   8          
+   9          extern xdata unsigned char CWADD2 ;   // 写指令代码地址(E2)
+  10          extern xdata unsigned char DWADD2 ;   // 写显示数进地址(E2)
+  11          extern xdata unsigned char CRADD2 ;   // 读状态字地址(E2)
+  12          extern xdata unsigned char DRADD2 ;   // 读显示数据地址(E2)
+  13          
+  14          
+  15          extern unsigned char Column;
+  16          extern unsigned char Page_ ;  // 页地址寄存器 D1,DO:页地址
+  17          extern unsigned char Code_ ;  // 字符代码寄存器
+  18          
+  19          extern unsigned char Command; // 指令寄存器
+  20          extern unsigned char LCDData; // 数据寄存器
+  21          
+  22          extern code unsigned char CCTAB[][32];
+  23          
+  24          void WriteCommandE1();
+  25          void WriteCommandE2();
+  26          void WriteDataE1();
+  27          void WriteDataE2();
+  28          
+  29          #define PD1  61        //  122/2 分成左右两半屏(122x32)
+  30          
+  31          // 中文显示子程序
+  32          void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_)
+  33          {
+  34   1        unsigned char i,j,k;
+  35   1        i = 0;
+  36   1        j = 0;
+  37   1        while(j<2) {
+  38   2          Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
+  39   2          WriteCommandE1();
+  40   2          WriteCommandE2();
+  41   2          k = Column;                   // 列地址值
+  42   2          while(k < Column + 16){
+  43   3            if (k < PD1) {              // 为左半屏显示区域(E1)
+  44   4              Command = k;
+  45   4              WriteCommandE1();         // 设置列地址值
+  46   4              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+  47   4              WriteDataE1();            // 写字模数据
+  48   4            } else{                     // 为右半屏显示区域(E2)
+  49   4              Command = k-PD1;
+  50   4              WriteCommandE2();         // 设置列地址值
+  51   4              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+  52   4              WriteDataE2();            // 写字模数据
+  53   4            };
+  54   3      
+C51 COMPILER V9.60.7.0   DIAPLAY_FUNCTION                                                  04/22/2024 11:15:07 PAGE 2   
+
+  55   3            i++;
+  56   3            if( ++k >= PD1 * 2) break;  // 列地址是否超出显示范围
+  57   3          } ;
+  58   2          j++;
+  59   2        };
+  60   1      }
+  61          
+  62          //英文显示子程序
+  63          void WriteEN8x8(void)
+  64          {
+  65   1          unsigned char i,j,k;
+  66   1      
+  67   1          i = 0;
+  68   1          j = 0;
+  69   1        
+  70   1          Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
+  71   1          WriteCommandE1();
+  72   1          WriteCommandE2();
+  73   1          k = Column;                   // 列地址值
+  74   1      
+  75   1            if (k < PD1) {              // 为左半屏显示区域(E1)
+  76   2              Command = k;
+  77   2              WriteCommandE1();         // 设置列地址值
+  78   2              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+  79   2              WriteDataE1();            // 写字模数据
+  80   2            } else{                     // 为右半屏显示区域(E2)
+  81   2              Command = k-PD1;
+  82   2              WriteCommandE2();         // 设置列地址值
+  83   2              LCDData = CCTAB[Code_][i]; // 取汉字字模数据
+  84   2              WriteDataE2();            // 写字模数据
+  85   2            };
+  86   1      
+  87   1            i++;
+  88   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    282    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

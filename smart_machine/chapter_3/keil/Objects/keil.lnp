@@ -1,0 +1,8 @@
+".\Objects\STARTUP.obj",
+".\Objects\chapter_3.obj",
+".\Objects\utils.obj",
+".\Objects\key_function.obj",
+".\Objects\diaplay_function.obj",
+".\Objects\calculate.obj" 
+TO ".\Objects\keil" 
+PRINT(".\Listings\keil.m51")

@@ -1,0 +1,74 @@
+C51 COMPILER V9.60.7.0   CALCULATE                                                         04/22/2024 11:17:37 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE CALCULATE
+OBJECT MODULE PLACED IN .\Objects\calculate.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\calculate.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listi
+                    -ngs\calculate.lst) TABS(2) OBJECT(.\Objects\calculate.obj)
+
+line level    source
+
+   1          typedef unsigned char uchar;
+   2          typedef unsigned int uint;
+   3          
+   4          uchar add(uchar a, uchar b);
+   5          uchar subtract(uchar a, uchar b);
+   6          uchar multiply(uchar a, uchar b);
+   7          uchar divide(uchar a, uchar b);
+   8          
+   9          uchar input_number [2] ={0};
+  10          uchar i = 0;
+  11          
+  12          void get_number_input(uchar key)
+  13          {
+  14   1          input_number[i] = key;
+  15   1          i = ++i%2;
+  16   1      }
+  17          
+  18          
+  19          uchar calculate_result(uchar (*functionPtr)( uchar a ,uchar b))
+  20          {
+  21   1          return functionPtr(input_number[0], input_number[1]);
+  22   1      }
+  23          
+  24          // 一位正整数的加法
+  25          uchar add(uchar a, uchar b) {
+  26   1          return a + b;
+  27   1      }
+  28          
+  29          // 一位正整数的减法
+  30          uchar subtract(uchar a, uchar b) {
+  31   1          if (a < b) {
+  32   2              return b - a;
+  33   2          }
+  34   1          return a - b;
+  35   1      }
+  36          
+  37          // 一位正整数的乘法
+  38          uchar multiply(uchar a, uchar b) {
+  39   1          return a * b;
+  40   1      }
+  41          
+  42          // 一位正整数的除法
+  43          uchar divide(uchar a, uchar b) {
+  44   1          if (b == 0) {
+  45   2              return 0;
+  46   2          }
+  47   1          return a / b;
+  48   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     63    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   CALCULATE                                                         04/22/2024 11:17:37 PAGE 2   
+
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

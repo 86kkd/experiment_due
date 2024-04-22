@@ -1,0 +1,27 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc.exe 生成活动文件",
+            "command": "C:\\Keil_v5\\UV4\\UV4.exe",
+            "args": [
+                "-b",
+                "${fileBasenameNoExtension}.uvproj",
+                "-j0",
+                "-t",
+                "Target 1",
+                "-o",
+                "${fileBasenameNoExtension}.uv4.log"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "调试器生成的任务。"
+        }
+    ],
+    "version": "2.0.0"
+}
