@@ -1,23 +1,23 @@
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
-extern xdata unsigned char CWADD1 ;   // 写指令代码地址(E1)
-extern xdata unsigned char DWADD1 ;   // 写显示数据地址(E1)
-extern xdata unsigned char CRADD1 ;   // 读状态字地址(E1)
-extern xdata unsigned char DRADD1 ;   // 读显示数据地址(E1)
+extern xdata uchar CWADD1 ;   // 写指令代码地址(E1)
+extern xdata uchar DWADD1 ;   // 写显示数据地址(E1)
+extern xdata uchar CRADD1 ;   // 读状态字地址(E1)
+extern xdata uchar DRADD1 ;   // 读显示数据地址(E1)
 
-extern xdata unsigned char CWADD2 ;   // 写指令代码地址(E2)
-extern xdata unsigned char DWADD2 ;   // 写显示数进地址(E2)
-extern xdata unsigned char CRADD2 ;   // 读状态字地址(E2)
-extern xdata unsigned char DRADD2 ;   // 读显示数据地址(E2)
+extern xdata uchar CWADD2 ;   // 写指令代码地址(E2)
+extern xdata uchar DWADD2 ;   // 写显示数进地址(E2)
+extern xdata uchar CRADD2 ;   // 读状态字地址(E2)
+extern xdata uchar DRADD2 ;   // 读显示数据地址(E2)
 
 
-extern unsigned char Column;
-extern unsigned char Page_ ;  // 页地址寄存器 D1,DO:页地址
-extern unsigned char Code_ ;  // 字符代码寄存器
+extern uchar Column;
+extern uchar Page_ ;  // 页地址寄存器 D1,DO:页地址
+extern uchar Code_ ;  // 字符代码寄存器
 
-extern unsigned char Command; // 指令寄存器
-extern unsigned char LCDData; // 数据寄存器
+extern uchar Command; // 指令寄存器
+extern uchar LCDData; // 数据寄存器
 
 
 
@@ -94,7 +94,7 @@ void Init()
 // 清屏
 void Clear()
 {
-  unsigned char i,j;
+  uchar i,j;
 
   i = 0;
   do {
@@ -119,7 +119,7 @@ void Clear()
 }
 void Delay5ms()		//@12.000MHz
 {
-	unsigned char i, j;
+	uchar i, j;
 
 	i = 10;
 	j = 183;
