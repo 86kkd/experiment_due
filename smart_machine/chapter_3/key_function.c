@@ -26,6 +26,8 @@ uint (*functionPtr)( uint a ,uint b);
 void Clear();							// «Â∆¡
 // functionPtr = add;
 // calculate_result(functionPtr);
+
+/*key function*/
 uint (*fun())( uint a ,uint b) function_map(uchar key)
 {
 	switch(key)

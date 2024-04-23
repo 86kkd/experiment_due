@@ -13,7 +13,11 @@ void WriteDataE2();
 
 #define PD1  61        //  122/2 分成左右两半屏(122x32)
 
-// 中文显示子程序
+/**中文显示子程序
+Page_: 页地址 0x00 - 0x03
+Column_: 列地址 0x00 - 0x80
+Code_ : 汉字字模数据 index
+*/ 
 void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_)
 {
   unsigned char i,j,k;

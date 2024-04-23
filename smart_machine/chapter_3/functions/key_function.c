@@ -10,6 +10,7 @@ typedef unsigned int uint;
 
 void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_);
 void get_number_input(uchar key);
+void dispaly_result(int result,uint num_input_n);
 
 uint add(uint a, uint b);
 uint subtract(uint a, uint b);
@@ -51,10 +52,9 @@ void direct_keyfn(unsigned char key, uint *num_input)
 		switch(key){
 		case 'H': {	// = 
 			col = num_input_n << 4;
-			WriteCHN16x16(Page_=0x00 ,col ,11);
+			WriteCHN16x16(Page_=0x00 ,col ,11); // display = 
 			col = (num_input_n+1) << 4;
 			result = calculate_result(functionPtr);
-			WriteCHN16x16(Page_=0x00 ,col ,result);
 			}
 			break;
 		case 'R':{ // clear
@@ -80,3 +80,16 @@ void direct_keyfn(unsigned char key, uint *num_input)
 	}
 }
 
+void dispaly_result(int result,uint num_input_n)
+{
+    if (result<0){
+		col = (num_input_n + 2) << 4;
+		WriteCHN16x16(Page_=0x00 ,col ,8); //display -	
+		col = (num_input_n + 3) << 4;
+		WriteCHN16x16(Page_=0x00 ,col ,-result); //display result
+	}
+	else {
+		col = (get_number_input + 2) << 4;
+		WriteCHN16x16(Page_=0x00 ,col ,result); //display result
+	}
+}
