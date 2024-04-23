@@ -5,7 +5,8 @@
         "character.h": "c",
         "reg51.h": "c",
         "REG51.H": "cpp",
-        "ABSACC.H": "cpp"
+        "ABSACC.H": "cpp",
+        "system_error": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

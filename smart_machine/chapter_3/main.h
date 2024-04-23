@@ -5,6 +5,8 @@
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
+extern uchar code KEY_NUMBER[];
+
 uchar code KEY_NUMBER[]={
 
 7,	8,	9,	10,	'T',	'R',
