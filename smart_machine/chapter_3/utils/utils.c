@@ -12,13 +12,8 @@ extern xdata uchar CRADD2 ;   // 读状态字地址(E2)
 extern xdata uchar DRADD2 ;   // 读显示数据地址(E2)
 
 
-extern uchar Column;
-extern uchar Page_ ;  // 页地址寄存器 D1,DO:页地址
-extern uchar Code_ ;  // 字符代码寄存器
-
-extern uchar Command; // 指令寄存器
-extern uchar LCDData; // 数据寄存器
-
+uchar Command; // 指令寄存器
+uchar LCDData; // 数据寄存器
 
 
 // 1.写指令代码子程序(E1)

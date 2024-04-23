@@ -7,17 +7,6 @@ typedef unsigned int uint;
 
 extern uchar code KEY_NUMBER[];
 
-uchar code KEY_NUMBER[]={
-
-7,	8,	9,	10,	'T',	'R',
-
-4,	5,	6,	11,	'S',	'M',
-
-1,	2,	3,	12,	'H',	'L',
-
-0,	15,	14,	13,	'X',	'N'
-};//按键键名
-
 //显示按键键名
 #define MODE_0	(uchar)0
 #define MODE_1	(uchar)1
@@ -43,9 +32,6 @@ xdata uchar DRADD2 _at_ 0x8007;   // 读显示数据地址(E2)
 uchar Column;
 uchar Page_ ;  // 页地址寄存器 D1,DO:页地址
 uchar Code_ ;  // 字符代码寄存器
-
-uchar Command; // 指令寄存器
-uchar LCDData; // 数据寄存器
 
 
 

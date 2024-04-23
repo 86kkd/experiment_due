@@ -1,21 +1,6 @@
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
-extern xdata unsigned char CWADD1 ;   // 写指令代码地址(E1)
-extern xdata unsigned char DWADD1 ;   // 写显示数据地址(E1)
-extern xdata unsigned char CRADD1 ;   // 读状态字地址(E1)
-extern xdata unsigned char DRADD1 ;   // 读显示数据地址(E1)
-
-extern xdata unsigned char CWADD2 ;   // 写指令代码地址(E2)
-extern xdata unsigned char DWADD2 ;   // 写显示数进地址(E2)
-extern xdata unsigned char CRADD2 ;   // 读状态字地址(E2)
-extern xdata unsigned char DRADD2 ;   // 读显示数据地址(E2)
-
-
-extern unsigned char Column;
-extern unsigned char Page_ ;  // 页地址寄存器 D1,DO:页地址
-extern unsigned char Code_ ;  // 字符代码寄存器
-
 extern unsigned char Command; // 指令寄存器
 extern unsigned char LCDData; // 数据寄存器
 
@@ -60,8 +45,7 @@ void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_)
 }
 
 //英文显示子程序
-void WriteEN8x8(void)
-{
+void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_){
 	  unsigned char i,j,k;
 
 		i = 0;

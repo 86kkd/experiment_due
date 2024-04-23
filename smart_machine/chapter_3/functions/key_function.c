@@ -1,7 +1,3 @@
-extern unsigned char Column;
-extern unsigned char Page_ ;  // Ò³µØÖ·¼Ä´æÆ÷ D1,DO:Ò³µØÖ·
-extern unsigned char Code_ ;  // ×Ö·û´úÂë¼Ä´æÆ÷
-
 extern unsigned char Command; // Ö¸Áî¼Ä´æÆ÷
 extern unsigned char LCDData; // Êı¾İ¼Ä´æÆ÷
 
@@ -26,24 +22,24 @@ uint (*functionPtr)( uint a ,uint b);
 void Clear();							// ÇåÆÁ
 // functionPtr = add;
 // calculate_result(functionPtr);
-uint (*fun())( uint a ,uint b) function_map(uchar key)
-{
-	switch(key)
+
+uint (*fun())( uint a ,uint b) function_map(uchar key) {
+	switch(key){
 		case 10:return add;break;
 		case 11:return subtract;break;
 		case 12:return multiply;break;
 		case 13:return divide;break
+	}
 }
 
 void direct_keyfn(unsigned char key, uint *num_input)
 {
-	unsigned char number_index = len_name + len_charcter + len_string;
-	unsigned char charcter_index = len_name + len_string;
-	unsigned int charcter;
-	unsigned int number;
+	uchar number_index = len_name + len_charcter + len_string;
+	uchar charcter_index = len_name + len_string;
+	uint charcter;
+	uint number;
 	uint num_input_n = *num_input;
 	uint result = 0;
-	
 	uint col;
 	
 		//number = key + number_index;
@@ -61,7 +57,7 @@ void direct_keyfn(unsigned char key, uint *num_input)
 			WriteCHN16x16(Page_=0x00 ,col ,result);
 			}
 			break;
-		case 'R':{
+		case 'R':{ // clear
 			col = --(*num_input) << 4;
 			WriteCHN16x16(Page_=0x00 ,col ,28);
 			}
