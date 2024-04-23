@@ -1,6 +1,6 @@
 批次/序号： 
 <center style="font-size:25px; margin-bottom:10pt; margin-top:10">桂林电子科技大学 电子工程与自动化学院</center>
-<center style="font-size:20px">智能仪器实验 预习报告</center>
+<center style="font-size:20px">智能仪器实验 总结报告</center>
 <table style="margin-top:20pt; margin-bottom:8pt; width:486.2pt; margin-bottom:0pt; border-collapse:collapse">
 				<tr style="height:27.4pt">
 					<td rowspan="2" style="width:65.35pt; padding-left:4.25pt; vertical-align:bottom">
@@ -145,217 +145,43 @@
  -->
 </table>
 
-# 一、实验原理理解和任务分析（20分，得分： ）
 
-1. 如何使用循环扫描按键
-2. 如何通过行列值查找按键的数码表
-3. 如何使用使用c语言实现液晶显示
-4. 如何存储按键的值并进行计算
-5. 如何制定显示位置
-6. 如何显示计算符号
-
-# 二、设计思路介绍（25分，得分： ）
-
-
-1. 使用宏定义区分keil和sdcc编译器的预操作
-2. 使用全局变量控制地址
-3. 使用位运算得到目标地址
-4. 使用函数实现read key和display key实现读取和显示的解耦
-5. 使用while循环实现key的循环扫描
-6. 使用数组储存需要的计算
+# 完成情况介绍（20分，得分： ）
 
 
 
-# 三、程序流程图介绍（25分，得分： ）
-<center>
+1. 完成列扫描方式编写扫描程序，储存当前按下按键的键值
 
-![img](chapter1.png)
+2. 读取键值，并将对应键的键名显示在制定位置
 
-</center>
-
-# 四、主程序介绍（20分，得分： ）
-
-main function 计算总线地址并启动主循环开始扫描按键并显示
-```c
-void main(void)
-{
-	uchar key_pos = 0;
-	uchar Code [] = {0x1c,0x1d,0x1e,0x00,0x01,0x02,0x03};
-	uchar index;
-
-	//LCD初始化
-	Init();
-	Clear();
-
-	//display name
-	for(index = 0; index < 2; index++)
-	{
-		Page_ = 0x03;
-		Column = (0x00+index)<<4 + 5;
-		Code_ = Code[index];
-		WriteCHN16x16(Page_,Column,Code_);
-	}
-	while(read_key() == 0xff);
-	Clear();
-	
-	while(1)
-	{
-		key_pos = read_key();
-		if(key_pos != 0xff)
-			precess_keyfn(KEY_NUMBER[key_pos]);
-		
-	}
-	
-}
-```
-read_key funtion 控制74h374循环输出0并读取键，如果读到了键将行放在高8位列放在低8位
-```c
-// sacnning keys from 0xX000 to 0xX008
-unsigned char read_key(void)
-{
-	unsigned char scan_data = 0x20;//列扫描用IO输出数据
-	unsigned char row = 0, col = 0;
-	unsigned char key_pos = 0xff;
-	//检测是否有按键按下
-	XBYTE[ADDR_KEY_WRITE] = 0x00;
-	if((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f)//有按键按下
-	{
-		//按键消抖
-		Delay5ms();
-		
-		//进行列检测
-		XBYTE[ADDR_KEY_WRITE] = scan_data;
-		while((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f)//检测到0x0f时即找到该列
-		{
-			col ++;
-			scan_data  = scan_data >> 1;
-			XBYTE[ADDR_KEY_WRITE] = scan_data;
-		}
-		
-		//进行行检测
-		XBYTE[ADDR_KEY_WRITE] = 0x00;
-		switch(XBYTE[ADDR_KEY_READ] & 0x0f)
-		{
-			case 0x07:row = 0;break;
-			case 0x0b:row = 1;break;
-			case 0x0d:row = 2;break;
-			case 0x0e:row = 3;break;
-			default:return 0xff;
-			
-		}
-		//合成按键位置
-		key_pos = row*6 + col;
-		while((XBYTE[ADDR_KEY_READ] & 0x0f) != 0x0f);
-		return key_pos;
-	}
-	else
-		return 0xff;
-}```
-
-display_bus function 控制数码管输出key
-
-```c
-// 中文显示子程序
-void WriteCHN16x16()
-{
-  unsigned char i,j,k;
-
-  i = 0;
-  j = 0;
-  while(j<2) {
-    Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
-    WriteCommandE1();
-    WriteCommandE2();
-    k = Column;                   // 列地址值
-    while(k < Column + 16){
-      if (k < PD1) {              // 为左半屏显示区域(E1)
-        Command = k;
-        WriteCommandE1();         // 设置列地址值
-        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
-        WriteDataE1();            // 写字模数据
-      } else{                     // 为右半屏显示区域(E2)
-        Command = k-PD1;
-        WriteCommandE2();         // 设置列地址值
-        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
-        WriteDataE2();            // 写字模数据
-      };
-
-      i++;
-      if( ++k >= PD1 * 2) break;  // 列地址是否超出显示范围
-    } ;
-    j++;
-  };
-}
-
-//英文显示子程序
-void WriteEN8x8(void)
-{
-	  unsigned char i,j,k;
-
-		i = 0;
-		j = 0;
-	
-		Command = ((Page_ + j) & 0x03) | 0xb8;   // 设置页地址
-    WriteCommandE1();
-    WriteCommandE2();
-    k = Column;                   // 列地址值
-
-      if (k < PD1) {              // 为左半屏显示区域(E1)
-        Command = k;
-        WriteCommandE1();         // 设置列地址值
-        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
-        WriteDataE1();            // 写字模数据
-      } else{                     // 为右半屏显示区域(E2)
-        Command = k-PD1;
-        WriteCommandE2();         // 设置列地址值
-        LCDData = CCTAB[Code_][i]; // 取汉字字模数据
-        WriteDataE2();            // 写字模数据
-      };
-
-      i++;
-//      if( ++k >= PD1 * 2)  // 列地址是否超出显示范围
-	
-}```
-
-calculate funtion 计算加减乘除
-
-```c
-void get_number_input(uchar key)
-{
-    input_number[i] = key;
-    i = ++i%2;
-}
+3. 在液晶指定位置显示指定信息
 
 
-uchar calculate_result(uchar (*functionPtr)( uchar a ,uchar b))
-{
-    return functionPtr(input_number[0], input_number[1]);
-}
 
-// 一位正整数的加法
-uchar add(uchar a, uchar b) {
-    return a + b;
-}
+# 主要问题分析（25分，得分： ）
 
-// 一位正整数的减法
-uchar subtract(uchar a, uchar b) {
-    if (a < b) {
-        return b - a;
-    }
-    return a - b;
-}
 
-// 一位正整数的乘法
-uchar multiply(uchar a, uchar b) {
-    return a * b;
-}
+1. 实验过程中在main内定义局部变量时出现编译报错问题,暂时不知道问题原因
 
-// 一位正整数的除法
-uchar divide(uchar a, uchar b) {
-    if (b == 0) {
-        return 0;
-    }
-    return a / b;
-}
+2. 使用char变量来计数时无法进行++等等数学计算
 
-```
+3. 实验室没有连接实验箱导致代码行为异常
+
+4. 不熟悉keil代码语法导致浪费时间
+
+5. 按键错位导致液晶显示问题
+
+
+# 归纳总结（20分，得分： ）
+
+
+通过本次实验，我们不仅理解了矩阵键盘和点阵汉字液晶的工作原理，而且掌握了与之相关的编程方法，这为后续复杂界面设计和交互打下了坚实的基础。
+
+实验中使用的LCD12232液晶显示屏内置SED1520控制器，该控制器整合了行、列驱动器和控制器，适用于小规模液晶显示模块。实验采用了直接访问方式，将液晶显示模块接口作为存储器或I/O设备直接挂在微处理器总线上，通过地址译码控制显示模块的读写操作。
+
+在实验过程中，我们首先通过列扫描方式编写了键盘扫描程序，成功实现了按键值的读取和存储。随后，我们根据键值在液晶屏上显示了对应的键名，包括数字0-9和字母A-F，以及右侧两列按键的首字母，其中EXEC键显示为X。此外，实验还包括了在液晶屏上显示指定信息的任务，如座号、姓名等，以及对数字、字母、符号和汉字的显示控制。
+
+通过本次实验，我们学习到了如何利用字模提取软件生成所需的数字、字母、符号和汉字的字模库，这对于液晶屏上复杂信息的显示至关重要。同时，实验中的LCD显示子程序流程图和LCD12232液晶显示屏与单片机的连接图为我们提供了清晰的操作指引和编程参考。
+
+总结来说，实验二不仅加深了我们对矩阵键盘和液晶显示技术的理解，而且通过实践提高了我们的编程能力和问题解决技巧。通过亲自编写和调试程序，我们获得了宝贵的实践经验，这将对我们未来在电子设计和微处理器应用领域的学习和研究大有裨益。
+
