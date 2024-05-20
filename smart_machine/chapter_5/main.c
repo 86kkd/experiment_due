@@ -3,7 +3,6 @@ extern unsigned char len_name;
 extern unsigned char len_string;
 extern unsigned char len_charcter;
 
-unsigned  long int signal_count=0;
 unsigned long int freq=0;
 unsigned long int period=50;// ’¢√≈ ±º‰
 
