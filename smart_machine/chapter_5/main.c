@@ -98,7 +98,7 @@ void time0_interrupt() interrupt 1 {
 }
 
 void time1_interrrupt() interrupt 3{
-	signal_count += 1;
+	// signal_count += 1;
 }
 
 void main(void) {
@@ -129,5 +129,3 @@ void main(void) {
 		}
 	}
 }
-
-

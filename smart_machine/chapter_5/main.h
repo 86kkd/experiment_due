@@ -17,11 +17,6 @@ xdata uchar CRADD2 _at_ 0x8006;   // 读状态字地址(E2)
 xdata uchar DRADD2 _at_ 0x8007;   // 读显示数据地址(E2)
 
 
-uchar Column;
-uchar Page_ ;  // 页地址寄存器 D1,DO:页地址
-uchar Code_ ;  // 字符代码寄存器
-
-
 
 uchar read_key(void);										//按键扫描
 void Delay5ms();					// 延时程序											//软件延时

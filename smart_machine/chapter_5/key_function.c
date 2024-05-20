@@ -22,12 +22,6 @@ void display_name (void);
 void write_code_16x16(uchar page,uchar col,uchar* str_code);
 void Delay500ms();
 
-uint add(uint a, uint b);
-uint subtract(uint a, uint b);
-uint multiply(uint a, uint b);
-uint divide(uint a, uint b);
-uint calculate_result(uint (*functionPtr)( uint a ,uint b));
-
 uint (*functionPtr)( uint a ,uint b);
 
 void Clear();							// «Â∆¡
