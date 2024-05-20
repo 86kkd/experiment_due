@@ -115,7 +115,6 @@ void time0_interrupt() interrupt 1 {
 	default:
 		break;
 	}
-	generateDownSawtoothWave();
 }
 
 void time1_interrrupt() interrupt 3{
@@ -128,8 +127,6 @@ void main(void) {
 	
 	uchar key_pos = 0xff;
 	uchar tmp_key = 0xff;
-	uchar student_number[] = {2,1,3};
-	uint num_input = 1;
 	
 	//LCD≥ı ºªØ
 	Init();
