@@ -1,4 +1,4 @@
-#include"main.h"
+#include "main.h"
 
 #define PD1  61        //  122/2 分成左右两半屏(122x32)
 
@@ -52,12 +52,12 @@ void write_code_8x8(uchar page,uchar col,uchar* str_code){
       if (k < PD1) {              // 为左半屏显示区域(E1)
         Command = k;
         WriteCommandE1();         // 设置列地址值
-        LCDData = CCTAB[str_code][i]; // 取汉字字模数据
+        LCDData = str_code[i]; // 取汉字字模数据
         WriteDataE1();            // 写字模数据
       } else{                     // 为右半屏显示区域(E2)
         Command = k-PD1;
         WriteCommandE2();         // 设置列地址值
-        LCDData = CCTAB[str_code][i]; // 取汉字字模数据
+        LCDData = str_code[i]; // 取汉字字模数据
         WriteDataE2();            // 写字模数据
       };
       i++;
