@@ -38,7 +38,7 @@ void direct_keyfn(unsigned char key)
 unsigned char number_index = len_name + len_charcter + len_string;
 
 	int display_bit;
-	unsigned long int tem_freq=signal_count;
+	unsigned long int tem_freq=freq;
 	int i;
 	switch(key)
 	{

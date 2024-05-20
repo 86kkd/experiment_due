@@ -86,11 +86,13 @@ void Init_Timer1(void) {
 }
 
 void time0_interrupt() interrupt 1 {
-	freq = signal_count/period;
-	//freq = ()/period;
+	// freq = signal_count/period;
+	freq = ((TH1<<8)|TL1)/period;
 	//给定初值
 	TH0=(15536-period)>>8;          	
 	TL0=(15536-period); 
+	TH1=0;
+	TL1=0;
 	//给定初值
   signal_count = 0;  
 }
