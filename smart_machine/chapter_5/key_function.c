@@ -7,10 +7,8 @@ extern code unsigned char number[][32];
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
-void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_);
-void get_number_input(uchar key);
-void display_name (void);
 void write_code_16x16(uchar page,uchar col,uchar* str_code);
+void display_name (void);
 void Delay500ms();
 
 void Clear();							// «Â∆¡

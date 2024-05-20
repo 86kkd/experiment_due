@@ -1,15 +1,14 @@
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#include"main.h"
 
-extern xdata uchar CWADD1 ;   // 写指令代码地址(E1)
-extern xdata uchar DWADD1 ;   // 写显示数据地址(E1)
-extern xdata uchar CRADD1 ;   // 读状态字地址(E1)
-extern xdata uchar DRADD1 ;   // 读显示数据地址(E1)
+xdata uchar CWADD1 _at_ 0x8000;   // 写指令代码地址(E1)
+xdata uchar DWADD1 _at_ 0x8001;   // 写显示数据地址(E1)
+xdata uchar CRADD1 _at_ 0x8002;   // 读状态字地址(E1)
+xdata uchar DRADD1 _at_ 0x8003;   // 读显示数据地址(E1)
 
-extern xdata uchar CWADD2 ;   // 写指令代码地址(E2)
-extern xdata uchar DWADD2 ;   // 写显示数进地址(E2)
-extern xdata uchar CRADD2 ;   // 读状态字地址(E2)
-extern xdata uchar DRADD2 ;   // 读显示数据地址(E2)
+xdata uchar CWADD2 _at_ 0x8004;   // 写指令代码地址(E2)
+xdata uchar DWADD2 _at_ 0x8005;   // 写显示数进地址(E2)
+xdata uchar CRADD2 _at_ 0x8006;   // 读状态字地址(E2)
+xdata uchar DRADD2 _at_ 0x8007;   // 读显示数据地址(E2)
 
 
 uchar Command; // 指令寄存器

@@ -1,5 +1,4 @@
-typedef unsigned char uchar;
-typedef unsigned int uint;
+#include"main.h"
 
 uchar add(uchar a, uchar b);
 uchar subtract(uchar a, uchar b);

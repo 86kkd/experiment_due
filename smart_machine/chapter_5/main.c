@@ -1,13 +1,9 @@
 #include "main.h"
-extern unsigned char len_name;
-extern unsigned char len_string;
-extern unsigned char len_charcter;
 
 unsigned long int freq=0;
 unsigned long int period=50;// 闸门时间
 
 void display_name (void) {
-	unsigned char number_index = len_name + len_charcter + len_string;
 	unsigned char student_number[] ={1,4} ;
 	uint index;
 	
@@ -67,7 +63,7 @@ unsigned char read_key(void)
 }
 
 void Init_Timer0(void) {
-	TMOD |= 0x01 | 0x04;      //使用模式1，定时器
+	TMOD |= 0x01 | 0x00;      //使用模式1，定时器
 	TH0=(15536-period)>>8;          	//给定初值
 	TL0=(15536-period);         
 	EA=1;            //总中断打开
@@ -76,7 +72,7 @@ void Init_Timer0(void) {
 }
 
 void Init_Timer1(void) {
-	TMOD |= 0x10 | 0x00;      //使用模式1，16位计数器
+	TMOD |= 0x10 | 0x40;      //使用模式1，16位计数器
 	TH1=0x00;          //给定初值
 	TL1=0x00;         
 	EA=1;            //总中断打开
@@ -93,11 +89,9 @@ void time0_interrupt() interrupt 1 {
 	TH1=0;
 	TL1=0;
 	//给定初值
-  signal_count = 0;  
 }
 
 void time1_interrrupt() interrupt 3{
-	// signal_count += 1;
 }
 
 void main(void) {

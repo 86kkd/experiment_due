@@ -1,16 +1,4 @@
-typedef unsigned char uchar;
-typedef unsigned int uint;
-
-extern unsigned char Command; // 指令寄存器
-extern unsigned char LCDData; // 数据寄存器
-
-extern code unsigned char CCTAB[][32];
-
-void Delay500ms();
-void WriteCommandE1();
-void WriteCommandE2();
-void WriteDataE1();
-void WriteDataE2();
+#include"main.h"
 
 #define PD1  61        //  122/2 分成左右两半屏(122x32)
 

@@ -4,7 +4,8 @@
             "name": "Target 1",
             "includePath": [
                 "C:\\Keil_v5\\C51\\INC",
-                "c:\\Users\\Aril Linda\\Desktop\\due\\experiment_due\\smart_machine\\chapter_3"
+                "c:\\Users\\Aril Linda\\Desktop\\due\\experiment_due\\smart_machine\\chapter_3",
+                "$workspaceDir/**"
             ],
             "defines": [
                 "__C51__",
