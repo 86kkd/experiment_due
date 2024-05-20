@@ -94,9 +94,21 @@ void time0_interrupt() interrupt 1 {
 	// calculate_frequency();
 	switch (singal_type)
 	{
-	case /* constant-expression */:
-		/* code */
-		break;
+	case 0:{
+		generateSquareWave();
+	} break;
+
+	case 1:{
+		generateUpSawtoothWave();
+	}break;
+
+	case 2:{
+		generateDownSawtoothWave();
+	}break;
+
+	case 3:{
+		generateTriangleWave();
+	}break;
 	
 	default:
 		break;

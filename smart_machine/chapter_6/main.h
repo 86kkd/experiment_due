@@ -59,3 +59,4 @@ void generateTriangleWave();
 void generateSquareWave();
 void generateUpSawtoothWave();
 void generateDownSawtoothWave();
+void generateSineWave();
