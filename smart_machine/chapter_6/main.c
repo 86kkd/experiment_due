@@ -109,7 +109,9 @@ void time0_interrupt() interrupt 1 {
 	case 3:{
 		generateTriangleWave();
 	}break;
-	
+	case 4:{
+		generateSineWave();
+	}	
 	default:
 		break;
 	}
