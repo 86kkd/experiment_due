@@ -32,5 +32,5 @@ void ReadDataE2();				// 6.读显示数据子程序(E2)
 void Init();							// 初始化程序	
 void Clear();							// 清屏
 void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_); // 中文显示子程序
-void WriteEN8x8(uchar Page_,uchar Column,uchar Code_);		//英文显示子程序
+void write_code_8x8(uchar Page_,uchar Column,uchar Code_);		//英文显示子程序
 void write_code_16x16(uchar page,uchar col,uchar* str_code);
