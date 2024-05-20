@@ -92,29 +92,7 @@ void calculate_frequency(){
 
 void time0_interrupt() interrupt 1 {
 	// calculate_frequency();
-	switch (singal_type)
-	{
-	case 0:{
-		generateSquareWave();
-	} break;
-
-	case 1:{
-		generateUpSawtoothWave();
-	}break;
-
-	case 2:{
-		generateDownSawtoothWave();
-	}break;
-
-	case 3:{
-		generateTriangleWave();
-	}break;
-	case 4:{
-		generateSineWave();
-	}	
-	default:
-		break;
-	}
+	gengerage_singal();	
 }
 
 void time1_interrrupt() interrupt 3{

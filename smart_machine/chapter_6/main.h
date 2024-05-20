@@ -60,3 +60,5 @@ void generateSquareWave();
 void generateUpSawtoothWave();
 void generateDownSawtoothWave();
 void generateSineWave();
+
+void gengerage_singal();
