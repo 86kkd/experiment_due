@@ -33,12 +33,10 @@ void direct_keyfn(unsigned char key)
 				tem_freq/=10;
 				if(tem_freq==0)break;
 			}	
-			Delay500ms();
 		}break;
 		
 		case 'R':{
 			display_name();
-			Delay500ms();
 		}break;
 		default:break;//其余情况不更新显示
 
