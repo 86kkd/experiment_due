@@ -123,3 +123,14 @@ void Delay5ms()		//@12.000MHz
 		while (--j);
 	} while (--i);
 }
+void Delay500ms()		//@12.000MHz
+{
+	uchar i, j;
+
+	i = 1000;
+	j = 183;
+	do
+	{
+		while (--j);
+	} while (--i);
+}

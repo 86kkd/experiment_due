@@ -26,7 +26,7 @@ uchar Code_ ;  // 字符代码寄存器
 uchar read_key(void);										//按键扫描
 void Delay5ms();					// 延时程序											//软件延时
 void precess_keyfn(uchar key_num);	//LCD显示模式切换
-				 
+void direct_keyfn(unsigned char key);
 
 void WriteCommandE1();		// 1.写指令代码子程序(E1)		 
 void WriteDataE1();				// 2.写显示数据子程序(E1)		 
@@ -38,4 +38,4 @@ void Init();							// 初始化程序
 void Clear();							// 清屏
 void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_); // 中文显示子程序
 void WriteEN8x8(uchar Page_,uchar Column,uchar Code_);		//英文显示子程序
-void write_code_16x16(uchar page,uchar col,uchar str_code);
+void write_code_16x16(uchar page,uchar col,uchar* str_code);

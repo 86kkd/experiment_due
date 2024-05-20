@@ -18,7 +18,7 @@ Page_: 页地址 0x00 - 0x03
 Column_: 列地址 0x00 - 0x80
 Code_ : 汉字字模数据 index
 */ 
-void write_code_16x16(uchar page,uchar col,uchar str_code) {
+void write_code_16x16(uchar page,uchar col,uchar* str_code) {
   unsigned char i,j,k;
   i = 0;
   j = 0;
@@ -31,12 +31,12 @@ void write_code_16x16(uchar page,uchar col,uchar str_code) {
       if (k < PD1) {              // 为左半屏显示区域(E1)
         Command = k;
         WriteCommandE1();         // 设置列地址值
-        LCDData = str_code; // 取汉字字模数据
+        LCDData = str_code[i]; // 取汉字字模数据
         WriteDataE1();            // 写字模数据
       } else{                     // 为右半屏显示区域(E2)
         Command = k-PD1;
         WriteCommandE2();         // 设置列地址值
-        LCDData = str_code; // 取汉字字模数据
+        LCDData = str_code[i]; // 取汉字字模数据
         WriteDataE2();            // 写字模数据
       };
 

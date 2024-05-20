@@ -8,12 +8,19 @@ extern unsigned char LCDData; // 数据寄存器
 extern unsigned char len_name;
 extern unsigned char len_string;
 extern unsigned char len_charcter;
+extern unsigned  long int signal_count;
+
+extern unsigned long int freq;
+extern code unsigned char number[][32];
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
 
 void WriteCHN16x16(uchar Page_,uchar Column,uchar Code_);
 void get_number_input(uchar key);
+void display_name (void);
+void write_code_16x16(uchar page,uchar col,uchar* str_code);
+void Delay500ms();
 
 uint add(uint a, uint b);
 uint subtract(uint a, uint b);
@@ -26,63 +33,55 @@ uint (*functionPtr)( uint a ,uint b);
 void Clear();							// 清屏
 
 
-void direct_keyfn(unsigned char key, uint *num_input)
+void direct_keyfn(unsigned char key)
 {
-	unsigned char number_index = len_name + len_charcter + len_string;
-	unsigned char charcter_index = len_name + len_string;
-	unsigned int charcter;
-	unsigned int number;
-	uint num_input_n = *num_input;
-	uint result = 0;
-	
-	uint col;
-	
-		//number = key + number_index;
-		//col = num_input_n <<4;
-		//WriteCHN16x16(Page_=0x00 ,col ,number);
-	
-	if(num_input_n == 3){
+unsigned char number_index = len_name + len_charcter + len_string;
+
+	int display_bit;
+	unsigned long int tem_freq=signal_count;
+	int i;
+	switch(key)
+	{
+		//显示模式0
+		case 15:{
+			Clear();
+			for (i=7;i>0;i--){
+				display_bit = tem_freq%10;
+				write_code_16x16(0x03,(0x01+i-2)<<4,&number[display_bit]);
+				tem_freq/=10;
+				if(tem_freq==0)break;
+			}	
+		Delay500ms();
+		}break;
 		
-		switch(key){
-		case 'H': {	// = 
-			col = num_input_n << 4;
-			WriteCHN16x16(Page_=0x00 ,col ,11);
-			col = (num_input_n+1) << 4;
-			result = calculate_result(functionPtr);
-			WriteCHN16x16(Page_=0x00 ,col ,result);
-			}
-			break;
 		case 'R':{
-			col = --(*num_input) << 4;
-			WriteCHN16x16(Page_=0x00 ,col ,28);
-			}
-			break;
-		default:{
-			charcter = key + charcter_index;
-			col = num_input_n <<4;
-			WriteCHN16x16(Page_=0x00 ,col ,number);
-			}
-			break;
-		}
-		
-	}else if (num_input_n == 1){;
-	}
-	else{
-		number = key + number_index;
-		col = num_input_n <<4;
-		WriteCHN16x16(Page_=0x00 ,col ,number);
+			display_name();
+			Delay500ms();
+		}break;
+		default:break;//其余情况不更新显示
+
 	}
 }
-
 void precess_keyfn(unsigned char key_num)
 {
 	unsigned char number_index = len_name + len_charcter + len_string;
+
+	int display_bit;
+	unsigned long int tem_freq=freq;
+	int i;
 	switch(key_num)
 	{
 		case 7://显示模式0
 		{
 			//Page_ = 0x02;			//设置显示行
 			// Column = 0x00;		//设置显示列
+
+			for (i=7;i>0;i--){
+				display_bit = tem_freq/10;
+				write_code_16x16(0x03,(0x01+i)<<4,&number[display_bit]);
+				tem_freq/=10;
+				if(tem_freq==0)break;
+			}
 			Code_ = 7 + number_index;
 			WriteCHN16x16(Page_=0x02 ,Column=0x00 ,Code_);
             get_number_input(7);
@@ -258,11 +257,12 @@ void precess_keyfn(unsigned char key_num)
 		}break;
 		case 15://显示模式1
 		{
-			Page_ = 0x00;
-			// Column = 0x10;
-			Code_ = 15 + number_index;
-			WriteCHN16x16(Page_ ,Column=0x00 ,Code_);
-            get_number_input(15);
+			for (i=7;i>0;i--){
+				display_bit = tem_freq/10;
+				write_code_16x16(0x03,(0x01+i)<<4,&number[display_bit]);
+				tem_freq/=10;
+				if(tem_freq==0)break;
+			}
 			
 		}break;
 		case 14://显示模式2
