@@ -2,7 +2,7 @@
 
 unsigned long int freq=0;
 unsigned long int clock_period=1000;// ’¢√≈ ±º‰
-unsigned long int signal_period=1;
+unsigned long int signal_period;
 unsigned int time_over_counter=0;
 
 void display_name (void) {

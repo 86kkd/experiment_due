@@ -67,6 +67,7 @@ void direct_keyfn(unsigned char key)
 	case 10:{
 		display_name();
 		if (start_gengrate==0){
+			signal_period=period_tab[0];
 			Init_Timer0();
 			Init_Timer1();
 			start_gengrate=1;

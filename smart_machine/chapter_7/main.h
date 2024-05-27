@@ -40,6 +40,7 @@ extern unsigned char LCDData; // Êý¾Ý¼Ä´æÆ÷
 //frequency
 extern unsigned long int freq;
 extern unsigned long int clock_period;
+extern code uchar period_tab[];
 extern unsigned long int signal_period;
 extern unsigned int time_over_counter;
 
