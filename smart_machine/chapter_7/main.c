@@ -105,7 +105,6 @@ void calculate_frequency(){
 }
 
 void time0_interrupt() interrupt 1 {
-	// calculate_frequency();
 	gengerage_singal();	
 	reload_signal_time0();
 }
