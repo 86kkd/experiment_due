@@ -120,6 +120,7 @@ void time1_interrrupt() interrupt 3{
 }
 
 
+
 void main(void) {
 	
 	uchar key_pos = 0xff;

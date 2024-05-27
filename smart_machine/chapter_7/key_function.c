@@ -73,9 +73,11 @@ void direct_keyfn(unsigned char key)
 		display_name();
 		if (start_gengrate==0){
 			signal_period=period_tab[0];
+			clock_period = clock_period_tabp[0];
 			Init_Timer0();
 			Init_Timer1();
 			start_gengrate=1;
+			DAC0832 = 255;
 		}
 		else{
 			ET0=0;           //定时器中断
@@ -83,7 +85,18 @@ void direct_keyfn(unsigned char key)
 			ET1=0;           
 			TR1=0;           
 			start_gengrate=0;
+			DAC0832 = 0;
 		}
+	}break;
+
+	case 1:{
+		DAC0832 = ~DAC0832;
+	}break;
+	case 2:{
+		DAC0832--;
+	}break;
+	case 3:{
+		DAC0832++;
 	}break;
 
 	default:break;//其余情况不更新显示
