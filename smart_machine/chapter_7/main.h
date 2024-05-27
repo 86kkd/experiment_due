@@ -68,10 +68,10 @@ void display_name (void);
 
 void display_number(unsigned long int input);
 
-void gengerage_singal();
+void gengerage_signal();
 
 // time interrupt
 void Init_Timer0(void);
 void Init_Timer1(void);
-void reload_time0();
+void reload_freq_time0();
 void reload_time1();

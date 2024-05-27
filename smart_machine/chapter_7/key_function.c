@@ -3,6 +3,7 @@
 uchar *output_signal;
 
 code uchar period_tab[]={1,100,200,300,400};
+code uchar clock_period_tab[]={100,200,300,400};
 uchar period_index = 0;
 
 uchar index = 0;
@@ -24,7 +25,7 @@ void display_number(unsigned long int input){
 }
 
 
-void gengerage_singal(){
+void gengerage_signal(){
 
 	DAC0832 = output_signal[index];
 	index = (index+1)%signal_quantity;
@@ -59,8 +60,12 @@ void direct_keyfn(unsigned char key)
 	}break;
 	
 	case 11:{
-		signal_period = period_tab[(period_index+1)%5];
-		display_number(signal_period);
+		// signal_period = period_tab[(period_index+1)%5];
+		// display_number(signal_period);
+
+		clock_period = clock_period_tab[(period_index+1)%5];
+		display_number(clock_period);
+
 		Delay500ms();
 	}break;
 	//diaplay mode 1

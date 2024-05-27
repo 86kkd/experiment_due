@@ -83,7 +83,7 @@ void Init_Timer1(void) {
 	TR1=1;           //定时器开关打开
 }
 
-void reload_time0(){
+void reload_freq_time0(){
 	TH0=(15536-clock_period)>>8;          	
 	TL0=(15536-clock_period); 
 }
@@ -105,8 +105,14 @@ void calculate_frequency(){
 }
 
 void time0_interrupt() interrupt 1 {
-	gengerage_singal();	
-	reload_signal_time0();
+
+	/* calculate signal */ 
+	// gengerage_signal();	
+	// reload_signal_time0();
+
+	/* calculate frequency*/
+	calculate_frequency();
+	reload_freq_time0();
 }
 
 void time1_interrrupt() interrupt 3{
@@ -115,11 +121,8 @@ void time1_interrrupt() interrupt 3{
 
 
 void main(void) {
-
 	
 	uchar key_pos = 0xff;
-	uchar tmp_key = 0xff;
-	
 	//LCD初始化
 	Init_LCD();
 	// Init_Timer0();
@@ -130,11 +133,6 @@ void main(void) {
 	while(1){
 		key_pos = read_key();
 		if(key_pos != 0xff){	
-			//precess_keyfn(KEY_NUMBER[key_pos]);
-			direct_keyfn(KEY_NUMBER[key_pos]);
-			tmp_key = key_pos;
-		}else {
-			key_pos = tmp_key;
 			//precess_keyfn(KEY_NUMBER[key_pos]);
 			direct_keyfn(KEY_NUMBER[key_pos]);
 		}
