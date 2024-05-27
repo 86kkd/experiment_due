@@ -37,25 +37,25 @@ void direct_keyfn(unsigned char key)
 	//display mode 0
 	case 9:{
 		output_signal = square_table;
-		display_number(period);
+		display_number(signal_period);
 		Delay500ms();
 	}break;
 	
 	case 6:{
 		output_signal = sin_table;
-		display_number(period);	
+		display_number(signal_period);	
 		Delay500ms();
 	}break;
 	
 	case 3:{
 		output_signal = triangle_table;
-		display_number(period);
+		display_number(signal_period);
 		Delay500ms();
 	}break;
 	
 	case 14:{
 		output_signal = up_sawtooth_table;
-		display_number(period);
+		display_number(signal_period);
 		Delay500ms();
 	}break;
 	
@@ -73,7 +73,7 @@ void direct_keyfn(unsigned char key)
 		display_name();
 		if (start_gengrate==0){
 			signal_period=period_tab[0];
-			clock_period = clock_period_tabp[0];
+			clock_period = clock_period_tab[0];
 			Init_Timer0();
 			Init_Timer1();
 			start_gengrate=1;
@@ -95,7 +95,7 @@ void direct_keyfn(unsigned char key)
 	case 2:{
 		DAC0832--;
 	}break;
-	case 3:{
+	case 4:{
 		DAC0832++;
 	}break;
 
