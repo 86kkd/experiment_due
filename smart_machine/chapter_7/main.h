@@ -65,11 +65,7 @@ void write_code_8x8(uchar page,uchar col,uchar* str_code);		//英文显示子程序
 void write_code_16x16(uchar page,uchar col,uchar* str_code);// 中文显示子程序
 void display_name (void);
 
-void generateTriangleWave();
-void generateSquareWave();
-void generateUpSawtoothWave();
-void generateDownSawtoothWave();
-void generateSineWave();
+void display_number(unsigned long int input);
 
 void gengerage_singal();
 

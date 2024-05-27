@@ -21,7 +21,6 @@ void display_number(unsigned long int input){
 		tmp/=10;
 		if(tmp==0)break;
 	}
-	Delay500ms();
 }
 
 
@@ -38,26 +37,31 @@ void direct_keyfn(unsigned char key)
 	case 9:{
 		output_signal = square_table;
 		display_number(period);
+		Delay500ms();
 	}break;
 	
 	case 6:{
 		output_signal = sin_table;
 		display_number(period);	
+		Delay500ms();
 	}break;
 	
 	case 3:{
 		output_signal = triangle_table;
 		display_number(period);
+		Delay500ms();
 	}break;
 	
 	case 14:{
 		output_signal = up_sawtooth_table;
 		display_number(period);
+		Delay500ms();
 	}break;
 	
 	case 11:{
 		signal_period = period_tab[(period_index+1)%5];
 		display_number(signal_period);
+		Delay500ms();
 	}break;
 	//diaplay mode 1
 	case 10:{
